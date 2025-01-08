@@ -32,57 +32,8 @@ export const DD_ENCODE_AUTHORIZER_CONTEXT = "DD_ENCODE_AUTHORIZER_CONTEXT";
 export const DD_DECODE_AUTHORIZER_CONTEXT = "DD_DECODE_AUTHORIZER_CONTEXT";
 export const DD_APM_FLUSH_DEADLINE_MILLISECONDS = "DD_APM_FLUSH_DEADLINE_MILLISECONDS";
 
-const execSync = require("child_process").execSync;
-
-const URL = require("url").URL;
-
-export function setGitEnvironmentVariables(lambdas: any[]): void {
+export function setGitEnvironmentVariables(_lambdas: any[]): void {
   log.debug("Adding source code integration...");
-}
-
-function getGitData(): { hash: string; gitRepoUrl: string } {
-  let hash: string;
-  let gitRepoUrl: string;
-
-  try {
-    hash = execSync("git rev-parse HEAD").toString().trim();
-    gitRepoUrl = execSync("git config --get remote.origin.url").toString().trim();
-  } catch (e) {
-    log.debug(`Failed to add source code integration. Error: ${e}`);
-    return { hash: "", gitRepoUrl: "" };
-  }
-  return { hash, gitRepoUrl: filterAndFormatGithubRemote(gitRepoUrl) };
-}
-
-// Removes sensitive info from the given git remote url and normalizes the url prefix.
-// "git@github.com:" and "https://github.com/" prefixes will be normalized into "github.com/"
-function filterAndFormatGithubRemote(rawRemote: string): string {
-  rawRemote = filterSensitiveInfoFromRepository(rawRemote);
-  if (!rawRemote) {
-    return rawRemote;
-  }
-  rawRemote = rawRemote.replace(/git@github\.com:|https:\/\/github\.com\//, "github.com/");
-
-  return rawRemote;
-}
-
-function filterSensitiveInfoFromRepository(repositoryUrl: string): string {
-  try {
-    if (!repositoryUrl) {
-      return repositoryUrl;
-    }
-    if (repositoryUrl.startsWith("git@")) {
-      return repositoryUrl;
-    }
-    const { protocol, hostname, pathname } = new URL(repositoryUrl);
-    if (!protocol || !hostname) {
-      return repositoryUrl;
-    }
-
-    return `${protocol}//${hostname}${pathname}`;
-  } catch (e) {
-    return repositoryUrl;
-  }
 }
 
 export function applyEnvVariables(lam: lambda.Function, baseProps: DatadogLambdaStrictProps): void {
