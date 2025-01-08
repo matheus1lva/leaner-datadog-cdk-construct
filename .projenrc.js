@@ -2,28 +2,19 @@
 const { awscdk, javascript } = require("projen");
 
 const project = new awscdk.AwsCdkConstructLibrary({
-  name: "datadog-cdk-constructs-v2",
+  name: "leaner-datadog-cdk-constructs-v2",
   description:
-    "CDK Construct Library to automatically instrument Python and Node Lambda functions with Datadog using AWS CDK v2",
+    "A leaner version of the Datadog CDK Construct Library to automatically instrument Python and Node Lambda functions with Datadog using AWS CDK v2",
   author: "Datadog",
   authorOrganization: true,
   entrypoint: "lib/index.js",
-  repositoryUrl: "https://github.com/DataDog/datadog-cdk-constructs",
+  repositoryUrl: "https://github.com/matheus1lva/leaner-datadog-cdk-construct",
 
   packageManager: javascript.NodePackageManager.YARN_CLASSIC,
   minNodeVersion: "14.15.0",
 
-  jsiiFqn: "projen.AwsCdkConstructLibrary",
   defaultReleaseBranch: "main",
   releaseEveryCommit: false,
-  publishToPypi: {
-    distName: "datadog-cdk-constructs-v2",
-    module: "datadog_cdk_constructs_v2",
-  },
-  publishToGo: {
-    moduleName: "github.com/DataDog/datadog-cdk-constructs-go",
-    packageName: "ddcdkconstruct",
-  },
   peerDeps: [],
   cdkVersion: "2.146.0",
   deps: ["loglevel"],
