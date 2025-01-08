@@ -38,16 +38,6 @@ const URL = require("url").URL;
 
 export function setGitEnvironmentVariables(lambdas: any[]): void {
   log.debug("Adding source code integration...");
-  const { hash, gitRepoUrl } = getGitData();
-
-  if (hash == "" || gitRepoUrl == "") return;
-
-  // We're using an any type here because AWS does not expose the `environment` field in their type
-  lambdas.forEach((lam) => {
-    if (lam.environment[DD_TAGS] !== undefined) {
-      lam.environment[DD_TAGS].value += `,git.commit.sha:${hash}`;
-    }
-  });
 }
 
 function getGitData(): { hash: string; gitRepoUrl: string } {

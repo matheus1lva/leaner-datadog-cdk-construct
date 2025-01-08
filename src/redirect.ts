@@ -8,16 +8,7 @@
 
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import log from "loglevel";
-import {
-  RuntimeType,
-  runtimeLookup,
-  DD_HANDLER_ENV_VAR,
-  AWS_LAMBDA_EXEC_WRAPPER_ENV_VAR,
-  AWS_LAMBDA_EXEC_WRAPPER,
-  JS_HANDLER_WITH_LAYERS,
-  JS_HANDLER,
-  PYTHON_HANDLER,
-} from "./constants";
+import { RuntimeType, runtimeLookup, JS_HANDLER_WITH_LAYERS, JS_HANDLER, PYTHON_HANDLER } from "./constants";
 
 /**
  * To avoid modifying code in the user's lambda handler, redirect the handler to a Datadog
@@ -33,19 +24,11 @@ export function redirectHandlers(lam: lambda.Function, addLayers: boolean): void
   const runtime: string = lam.runtime.name;
   const runtimeType: RuntimeType = runtimeLookup[runtime];
 
-  if (runtimeType === RuntimeType.JAVA || runtimeType === RuntimeType.DOTNET) {
-    lam.addEnvironment(AWS_LAMBDA_EXEC_WRAPPER_ENV_VAR, AWS_LAMBDA_EXEC_WRAPPER);
-    return;
-  }
-
   const cfnFuntion = lam.node.defaultChild as lambda.CfnFunction;
   if (cfnFuntion === undefined) {
     log.debug("Unable to get Lambda Function handler");
     return;
   }
-
-  const originalHandler = cfnFuntion.handler as string;
-  lam.addEnvironment(DD_HANDLER_ENV_VAR, originalHandler);
 
   const handler = getDDHandler(runtimeType, addLayers);
   if (handler === null) {

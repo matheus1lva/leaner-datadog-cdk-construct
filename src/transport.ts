@@ -8,7 +8,6 @@
 
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import log from "loglevel";
-import { runtimeLookup, RuntimeType } from "./index";
 
 export const API_KEY_ENV_VAR = "DD_API_KEY";
 export const API_KEY_SECRET_ARN_ENV_VAR = "DD_API_KEY_SECRET_ARN";
@@ -66,25 +65,11 @@ export class Transport {
 
   applyEnvVars(lam: lambda.Function) {
     log.debug(`Setting Datadog transport environment variables...`);
-    lam.addEnvironment(FLUSH_METRICS_TO_LOGS_ENV_VAR, this.flushMetricsToLogs.toString());
     if (this.site !== undefined && this.flushMetricsToLogs === false) {
       lam.addEnvironment(SITE_URL_ENV_VAR, this.site);
     }
     if (this.apiKey !== undefined) {
       lam.addEnvironment(API_KEY_ENV_VAR, this.apiKey);
-    }
-    if (this.apiKeySecretArn !== undefined) {
-      const isNode = runtimeLookup[lam.runtime.name] === RuntimeType.NODE;
-      const isSendingSynchronousMetrics = this.extensionLayerVersion === undefined && !this.flushMetricsToLogs;
-      if (isSendingSynchronousMetrics && isNode) {
-        throw new Error(
-          `\`apiKeySecretArn\` is not supported for Node runtimes when using Synchronous Metrics. Use either \`apiKey\` or \`apiKmsKey\`.`,
-        );
-      }
-      lam.addEnvironment(API_KEY_SECRET_ARN_ENV_VAR, this.apiKeySecretArn);
-    }
-    if (this.apiKmsKey !== undefined) {
-      lam.addEnvironment(KMS_API_KEY_ENV_VAR, this.apiKmsKey);
     }
   }
 }
